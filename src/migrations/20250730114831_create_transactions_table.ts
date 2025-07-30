@@ -5,7 +5,7 @@ export async function up(knex: Knex): Promise<void> {
     table.increments('id').primary();
     table.integer('wallet_id').unsigned().references('id').inTable('wallets').onDelete('CASCADE');
     table.enum('type', ['DEPOSIT', 'WITHDRAWAL', 'TRANSFER_SENT', 'TRANSFER_RECEIVED']).notNullable();
-    table.decimal('amount', 15, 2).notNullable();
+    table.decimal('amount', 10, 2).notNullable();
     table.integer('recipient_wallet_id').unsigned().references('id').inTable('wallets').nullable();
     table.enum('status', ['PENDING', 'COMPLETED', 'FAILED']).notNullable();
     table.timestamps(true, true);

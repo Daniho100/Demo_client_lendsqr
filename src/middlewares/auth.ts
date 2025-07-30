@@ -1,15 +1,74 @@
+// import { Request, Response, NextFunction } from 'express';
+// import jwt from 'jsonwebtoken';
+// import { AppError, handleError } from '../utils';
+// import { IJWTPayload } from '../types';
+
+// declare global {
+//   namespace Express {
+//     interface Request {
+//       user?: IJWTPayload;
+//     }
+//   }
+// }
+
+// export const authMiddleware = (req: Request, res: Response, next: NextFunction): void => {
+//   try {
+//     const authHeader = req.headers.authorization;
+//     if (!authHeader || !authHeader.startsWith('Bearer ')) {
+//       throw new AppError('Authorization header with Bearer token is required', 401);
+//     }
+
+//     const token = authHeader.split(' ')[1];
+//     if (!process.env.JWT_SECRET) {
+//       throw new AppError('JWT secret not configured', 500);
+//     }
+
+//     const payload = jwt.verify(token, process.env.JWT_SECRET) as IJWTPayload;
+//     console.log(`Authenticated user: ${JSON.stringify(payload)}`);
+//     req.user = payload;
+//     next();
+//   } catch (error) {
+//     const { message, statusCode } = handleError(error);
+//     console.error(`Auth middleware error: ${message}`);
+//     res.status(statusCode).json({ message });
+//   }
+// };
+
+
+
+
+
+
+// src/middlewares/auth.ts
 import { Request, Response, NextFunction } from 'express';
-import { verifyToken } from '../utils';
+import jwt from 'jsonwebtoken';
+import { AppError, handleError } from '../utils';
+import { IJWTPayload } from '../types';
 
-export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  if (!token) return res.status(401).json({ message: 'Unauthorized' });
-
+export const authMiddleware = (req: Request, res: Response, next: NextFunction): void => {
   try {
-    const decoded = verifyToken(token);
-    req.user = decoded;
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new AppError('Authorization header with Bearer token is required', 401);
+    }
+
+    const token = authHeader.split(' ')[1];
+    if (!token) {
+      throw new AppError('Authorization header with Bearer token is required', 401);
+    }
+
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      throw new AppError('JWT secret not configured', 500);
+    }
+
+    const payload = jwt.verify(token, secret) as IJWTPayload;
+    console.log(`Authenticated user: ${JSON.stringify(payload)}`);
+    req.user = payload;
     next();
   } catch (error) {
-    res.status(401).json({ message: 'Invalid token' });
+    const { message, statusCode } = handleError(error);
+    console.error(`Auth middleware error: ${message}`);
+    res.status(statusCode).json({ message });
   }
 };

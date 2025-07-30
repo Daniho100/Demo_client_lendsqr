@@ -3,16 +3,16 @@ export interface IUser {
   email: string;
   name: string;
   password: string;
-  created_at: Date;
-  updated_at: Date;
+  created_at: Date | string;
+  updated_at: Date | string;
 }
 
 export interface IWallet {
   id: number;
   user_id: number;
   balance: number;
-  created_at: Date;
-  updated_at: Date;
+  created_at: Date | string;
+  updated_at: Date | string;
 }
 
 export interface ITransaction {

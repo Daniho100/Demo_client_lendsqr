@@ -24,7 +24,7 @@ export class WalletController {
   async transfer(req: Request, res: Response): Promise<void> {
     try {
       const { toEmail, amount }: ITransferRequest = req.body;
-      const user = req.user as IJWTPayload; // Line 27
+      const user = req.user as IJWTPayload;
       if (!toEmail || !amount || amount <= 0) {
         throw new AppError('Invalid transfer details', 400);
       }
@@ -39,7 +39,7 @@ export class WalletController {
   async withdraw(req: Request, res: Response): Promise<void> {
     try {
       const { amount }: IWithdrawRequest = req.body;
-      const user = req.user as IJWTPayload; // Line 42
+      const user = req.user as IJWTPayload;
       if (!amount || amount <= 0) {
         throw new AppError('Invalid amount', 400);
       }
