@@ -33,7 +33,7 @@ This wallet service serves as the backbone for Demo Credit, a mobile lending app
 - Balance check
 
 ### Security & Reliability
-- Faux JWT auth middleware
+- JWT auth middleware
 - Input validation
 - Knex transaction support
 - Error handling (insufficient funds, blacklisted users, etc.)
@@ -43,7 +43,7 @@ This wallet service serves as the backbone for Demo Credit, a mobile lending app
 - TypeScript interfaces for consistency
 - Fixed MySQL `DECIMAL` bug by treating balance as a number
 - Faux auth using `jsonwebtoken` per instructions
-- Jest tests for all operations and edge cases
+- Postman/Jest tests for all operations and edge cases
 
 ## Entity-Relationship (E-R) Diagram (Textual)
 Table users {
@@ -103,22 +103,23 @@ Ref: wallets.id > transactions.recipient_wallet_id [one-to-many, nullable]
 
 ### Installation
 ```bash
-git clone <repo-url>
-cd demo-credit-wallet
+git clone https://github.com/Daniho100/Demo_client_lendsqr
+cd Demo_client_lendsqr
 npm install
 cp .env.example .env
 
 # Fill in DB credentials and JWT secret in .env
 npm run migrate
 npm start
+
 API Endpoints
-Method	Endpoint	Description	Auth Required
-POST	/api/users	Create a user (with blacklist check)	No
-POST	/api/auth/login	User login (JWT issuance)	No
-POST	/api/wallets/deposit	Fund wallet	Yes
-POST	/api/wallets/transfer	Transfer funds to another user	Yes
-POST	/api/wallets/withdraw	Withdraw from wallet	Yes
-GET	/api/wallets/balance/:userId	Get wallet balance	Yes
+Method	Endpoint	                       Description                 Auth Required
+POST	/api/users	            Create a user (with blacklist check)	    No
+POST	/api/auth/login	        User login    (JWT issuance)	            No
+POST	/api/wallets/deposit	Fund wallet	                                Yes
+POST	/api/wallets/transfer	Transfer funds to another user	            Yes
+POST	/api/wallets/withdraw	Withdraw from wallet	                    Yes
+GET	/api/wallets/balance/:userId	Get wallet balance	                    Yes
 
 Example: Transfer Funds
 curl -X POST http://localhost:8081/api/wallets/transfer \
@@ -127,6 +128,9 @@ curl -X POST http://localhost:8081/api/wallets/transfer \
 -d '{"toEmail": "mary@gmail.com", "amount": 500}'
 
 Testing
+Postman use webpostman or desktop(ideal)
+
+Jest
 npm install --save-dev jest ts-jest supertest knex-mock-client
 Run Tests
 

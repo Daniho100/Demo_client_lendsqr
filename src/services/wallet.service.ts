@@ -21,9 +21,7 @@ export class WalletService {
 
   async createUser(email: string, name: string, userId: number, trx?: Knex.Transaction): Promise<IWallet> {
     try {
-      console.log(`Creating wallet for userId: ${userId}, email: ${email}, name: ${name}`);
       const wallet = await this.walletModel.create(userId, trx);
-      console.log('Wallet created:', wallet);
       return wallet;
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown error';
@@ -41,14 +39,10 @@ export class WalletService {
   if (amount <= 0) throw new AppError('Deposit amount must be positive', 400);
   try {
     await this.knex.transaction(async (trx) => {
-      console.log(`Depositing ${amount} to userId: ${userId}`);
       const wallet: IWallet | undefined = await this.walletModel.findByUserId(userId, trx);
-      console.log('Wallet found:', wallet);
       if (!wallet) throw new AppError('Wallet not found', 404);
       const newBalance = Number(wallet.balance) + Number(amount);
-      console.log(`Calculated new balance: ${newBalance} for walletId: ${wallet.id}`);
       await this.walletModel.updateBalance(wallet.id, newBalance, trx);
-      console.log(`Balance updated to: ${newBalance}`);
       await this.transactionModel.create(
         {
           wallet_id: wallet.id,
@@ -58,7 +52,6 @@ export class WalletService {
         },
         trx
       );
-      console.log('Transaction created:', { wallet_id: wallet.id, type: 'DEPOSIT', amount, status: 'COMPLETED' });
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';
@@ -72,27 +65,18 @@ async transfer(fromUserId: number, toEmail: string, amount: number): Promise<voi
   if (amount <= 0) throw new AppError('Transfer amount must be positive', 400);
   try {
     await this.knex.transaction(async (trx) => {
-      console.log(`Transferring ${amount} from userId: ${fromUserId} to ${toEmail}`);
       const fromWallet: IWallet | undefined = await this.walletModel.findByUserId(fromUserId, trx);
-      console.log('From wallet:', fromWallet);
       if (!fromWallet) throw new AppError('Wallet not found', 404);
       if (Number(fromWallet.balance) < amount) throw new AppError('Insufficient funds', 400);
       const toUser = await this.userService.getUserByEmail(toEmail);
-      console.log('To user:', toUser);
       if (!toUser) throw new AppError('Recipient not found', 404);
       const toWallet: IWallet | undefined = await this.walletModel.findByUserId(toUser.id, trx);
-      console.log('To wallet:', toWallet);
       if (!toWallet) throw new AppError('Recipient wallet not found', 404);
       const fromNewBalance = Number(fromWallet.balance) - Number(amount);
-      console.log(`Calculated new sender balance: ${fromNewBalance} (type: ${typeof fromNewBalance})`);
       await this.walletModel.updateBalance(fromWallet.id, fromNewBalance, trx);
-      console.log(`From balance updated to: ${fromNewBalance}`);
       const toNewBalance = Number(toWallet.balance) + Number(amount);
-      console.log(`Calculated new recipient balance: ${toNewBalance} (type: ${typeof toNewBalance})`);
       await this.walletModel.updateBalance(toWallet.id, toNewBalance, trx);
-      console.log(`To balance updated to: ${toNewBalance}`);
       const updatedToWallet = await this.walletModel.findByUserId(toUser.id, trx);
-      console.log(`Recipient wallet after update:`, updatedToWallet);
       await this.transactionModel.create(
         {
           wallet_id: fromWallet.id,
@@ -103,7 +87,6 @@ async transfer(fromUserId: number, toEmail: string, amount: number): Promise<voi
         },
         trx
       );
-      console.log('Transaction created:', { wallet_id: fromWallet.id, type: 'TRANSFER_SENT', amount, recipient_wallet_id: toWallet.id });
       await this.transactionModel.create(
         {
           wallet_id: fromWallet.id,
@@ -114,7 +97,6 @@ async transfer(fromUserId: number, toEmail: string, amount: number): Promise<voi
         },
         trx
       );
-      console.log('Transaction created:', { wallet_id: toWallet.id, type: 'TRANSFER_RECEIVED', amount, recipient_wallet_id: toWallet.id });
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';
@@ -127,13 +109,10 @@ async withdraw(userId: number, amount: number): Promise<void> {
   if (amount <= 0) throw new AppError('Withdrawal amount must be positive', 400);
   try {
     await this.knex.transaction(async (trx) => {
-      console.log(`Withdrawing ${amount} from userId: ${userId}`);
       const wallet: IWallet | undefined = await this.walletModel.findByUserId(userId, trx);
-      console.log('Wallet found:', wallet);
       if (!wallet) throw new AppError('Wallet not found', 404);
       if (wallet.balance < amount) throw new AppError('Insufficient funds', 400);
       await this.walletModel.updateBalance(wallet.id, wallet.balance - amount, trx);
-      console.log(`Balance updated to: ${wallet.balance - amount}`);
       await this.transactionModel.create(
         {
           wallet_id: wallet.id,
@@ -143,7 +122,6 @@ async withdraw(userId: number, amount: number): Promise<void> {
         },
         trx
       );
-      console.log('Transaction created:', { wallet_id: wallet.id, type: 'WITHDRAWAL', amount, status: 'COMPLETED' });
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';
@@ -154,9 +132,7 @@ async withdraw(userId: number, amount: number): Promise<void> {
 
   async getBalance(userId: number): Promise<number> {
     try {
-      console.log(`Getting balance for userId: ${userId}`);
       const wallet: IWallet | undefined = await this.walletModel.findByUserId(userId);
-      console.log('Wallet found:', wallet);
       if (!wallet) throw new AppError('Wallet not found', 404);
       return wallet.balance;
     } catch (error) {
