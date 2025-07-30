@@ -101,7 +101,12 @@ export class UserController {
         throw new AppError('Email, name, and password are required', 400);
       }
       console.log(`Hashing password for ${email}`);
+      console.log(`Raw password:`, password);
+
       const hashedPassword = await bcrypt.hash(password, 10);
+
+      console.log(`Password hashed successfully:`, hashedPassword);
+
       console.log(`Creating user with email: ${email}, name: ${name}`);
       const user = await this.knex.transaction(async (trx) => {
         const user = await this.userService.createUser(email, name, hashedPassword, trx);
@@ -111,11 +116,12 @@ export class UserController {
         return user;
       });
       res.status(201).json({ user });
-    } catch (error) {
-      const { message, statusCode } = handleError(error);
-      console.error(`Error in createUser: ${message}`);
-      res.status(statusCode).json({ message });
-    }
+    } catch (error: any) {
+        console.error('Error in createUser:', error.message || error);
+        console.error(error.stack);
+        const { message, statusCode } = handleError(error);
+        res.status(statusCode).json({ message });
+      }
   }
 
   async login(req: Request, res: Response): Promise<void> {

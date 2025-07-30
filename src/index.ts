@@ -90,12 +90,30 @@ app.use((error: Error, req: express.Request, res: express.Response, next: expres
   res.status(statusCode).json({ message });
 });
 
-knexInstance.raw('SELECT 1').then(() => {
-  console.log('MySQL database connection successful');
-  app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+// knexInstance.raw('SELECT 1').then(() => {
+//   console.log('MySQL database connection successful');
+//   app.listen(port, () => {
+//     console.log(`Server is running on port ${port}`);
+//   });
+// }).catch((err) => {
+//   console.error('Database connection failed:', err.message);
+//   process.exit(1);
+// });
+
+
+
+knexInstance.migrate.latest()
+  .then(() => {
+    console.log('✅ Migrations ran successfully');
+    return knexInstance.raw('SELECT 1');
+  })
+  .then(() => {
+    console.log('MySQL database connection successful');
+    app.listen(port, () => {
+      console.log(`Server is running on port ${port}`);
+    });
+  })
+  .catch((err) => {
+    console.error('Database startup failed:', err.message);
+    process.exit(1);
   });
-}).catch((err) => {
-  console.error('Database connection failed:', err.message);
-  process.exit(1);
-});
