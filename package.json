@@ -6,7 +6,7 @@
     "start": "ts-node src/index.ts",
     "build": "tsc",
     "migrate": "knex migrate:latest",
-    "test": "jest --config jest.config.ts",
+    "test": "jest --coverage",
     "test:watch": "jest --config jest.config.ts --watch"
   },
   "keywords": [],
@@ -14,7 +14,6 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.1.0",
     "axios": "^1.11.0",
@@ -29,6 +28,7 @@
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
+    "@types/express": "^5.0.3",
     "@types/jest": "^30.0.0",
     "@types/supertest": "^6.0.3",
     "jest": "^30.0.5",

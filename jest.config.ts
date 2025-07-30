@@ -2,9 +2,8 @@
 export default {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  testMatch: ['**/?(*.)+(spec|test).ts'],
-  setupFilesAfterEnv: ['./jest.setup.ts'],
-  moduleNameMapper: {
-    '^(\\.{1,2}/.*)\\.js$': '$1',
-  },
+  testMatch: ['**/__tests__/**/*.test.ts'],
+  moduleFileExtensions: ['ts', 'js', 'json'],
+  roots: ['<rootDir>/__tests__'],
+  clearMocks: true
 };
